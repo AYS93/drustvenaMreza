@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Dobrodošli na X2</h1>
+
+<div id="objave">
+    Učitava se...
+</div>
+
+<script>
+    const xhr = new XMLHttpRequest();
+    const method = "GET";
+    const url = "/objave";
+    const responseType = "json";
+
+    const objaveElement = document.getElementById("objave");
+
+    function lajkDugme(objava) {
+        return "<button class='btn btn-primary btn-sm' onclick='handleLajkDugme(" + objava.id + ", " + objava.svidjanja + ")'>"
+            + objava.svidjanja + " Sviđa mi se</button>"
+    }
+
+    function handleLajkDugme(objavaId, brojacSvidjanja) {
+        console.log(objavaId, brojacSvidjanja);
+    }
+
+    function formatirajObjaveElement(objava) {
+        var formatiranString = "<div class='mb-4 objava' id='objava-" + objava.id + "'>"
+             + objava.id + "<p>" + objava.sadrzaj + "</p><div class='btn-group'>" + lajkDugme(objava) + "</div></div>"
+        return formatiranString;
+    }
+
+    xhr.responseType = responseType;
+    xhr.open(method, url);
+    xhr.onload = function() {
+        var listaObjava = xhr.response.response;
+        var objaveString = "";
+        var i;
+        for (i = 0; i < listaObjava.length; i++) {
+            var objava = formatirajObjaveElement(listaObjava[i]);
+            objaveString += objava;
+        }
+        objaveElement.innerHTML = objaveString;
+    };
+    xhr.send();
+</script>
+{% endblock content %}
