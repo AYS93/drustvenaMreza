@@ -10,11 +10,12 @@
         -> Korisnik + svi koje korisnik prati?
         -> Korisnikovi cvrkuti?
 
-2. Cvrkuti (to jest objave)
+2. Objave
     -> Kreiranje
         -> Tekst
         -> Slika -> Media Storage Server 
     -> Brisanje
-    -> "Od-cvrkutanje" (Deljenje nečije objave)
+    -> Deljenje nečije objave (Podeli objavu)
+    -> Sviđanja
 
 3. Praćenje / Pratioci

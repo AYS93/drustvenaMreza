@@ -17,11 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from objave.views import pocetni_view, objava_detaljni_view, objava_lista_view
+from objave.views import (pocetni_view, objava_detaljni_view, 
+    objava_lista_view, objava_kreiraj_view)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', pocetni_view),
+    path('objava-kreiraj', objava_kreiraj_view),
     path('objave/<int:objava_id>', objava_detaljni_view),
     path('objave', objava_lista_view)
 ]

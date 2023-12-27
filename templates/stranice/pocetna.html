@@ -1,19 +1,78 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Dobrodošli na X2</h1>
+<div class="row text-center">
+    <div class="col">
+        <h1>Dobrodošli na X2</h1>
+    </div>
+</div>
 
-<div id="objave">
+<div class="row mb-3">
+    <div class="col-md-4 mx-auto col-10">
+        <form class="form" id="forma-objava-kreiraj" method="POST" action="/objava-kreiraj">
+            {% csrf_token %}
+            <input type="hidden" value="/" name="next"/>
+            <textarea class="form-control" name="sadrzaj" placeholder="Vaša objava..."></textarea>
+            <br/>
+            <button type="submit" class="btn btn-primary">Objavi</button>
+        </form>
+    </div>
+</div>
+
+<div class="row" id="objave">
     Učitava se...
 </div>
 
 <script>
-    const xhr = new XMLHttpRequest();
-    const method = "GET";
-    const url = "/objave";
-    const responseType = "json";
-
+    const formaObjavaKreirajElement = document.getElementById("forma-objava-kreiraj");
     const objaveElement = document.getElementById("objave");
+
+    function handleFormaObjavaKreirajSubmit(event) {
+        event.preventDefault();
+        const mojaForma = event.target;
+        const mojFormData = new FormData(mojaForma);
+        const krajnjatacka = mojaForma.getAttribute("action");
+        const metod = mojaForma.getAttribute("method");
+        const xhr = new XMLHttpRequest();
+        xhr.open(metod, krajnjatacka);
+        // Da bi AJAX bio TRUE ove dve linije ispod
+        xhr.setRequestHeader("HTTP_X_REQUESTED_WITH", "XMLHttpRequest");
+        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+        xhr.onload = function() {
+            if(xhr.status === 201) {
+                const novaObjava = xhr.response;
+                const novaObjavaJSON = JSON.parse(novaObjava);
+                const noviObjavaElement = formatirajObjaveElement(novaObjavaJSON);
+                console.log(noviObjavaElement);
+            }
+        }
+        xhr.send(mojFormData);
+    }
+
+    formaObjavaKreirajElement.addEventListener("submit", handleFormaObjavaKreirajSubmit);
+
+    const ucitajObjave = function(objaveElement) {
+        const xhr = new XMLHttpRequest();
+        const method = "GET";
+        const url = "/objave";
+        const responseType = "json";
+
+        xhr.responseType = responseType;
+        xhr.open(method, url);
+        xhr.onload = function() {
+            var listaObjava = xhr.response.response;
+            var objaveString = "";
+            var i;
+            for (i = 0; i < listaObjava.length; i++) {
+                    var objava = formatirajObjaveElement(listaObjava[i]);
+                    objaveString += objava;
+            }
+            objaveElement.innerHTML = objaveString;
+        };
+        xhr.send();
+    }
+
+    ucitajObjave(objaveElement);
 
     function lajkDugme(objava) {
         return "<button class='btn btn-primary btn-sm' onclick='handleLajkDugme(" + objava.id + ", " + objava.svidjanja + ")'>"
@@ -25,23 +84,9 @@
     }
 
     function formatirajObjaveElement(objava) {
-        var formatiranString = "<div class='mb-4 objava' id='objava-" + objava.id + "'>"
+        var formatiranString = "<div class='col-12 col-md-10 mx-auto border rounded border-info py-3 mb-4 objava' id='objava-" + objava.id + "'>"
              + objava.id + "<p>" + objava.sadrzaj + "</p><div class='btn-group'>" + lajkDugme(objava) + "</div></div>"
         return formatiranString;
     }
-
-    xhr.responseType = responseType;
-    xhr.open(method, url);
-    xhr.onload = function() {
-        var listaObjava = xhr.response.response;
-        var objaveString = "";
-        var i;
-        for (i = 0; i < listaObjava.length; i++) {
-            var objava = formatirajObjaveElement(listaObjava[i]);
-            objaveString += objava;
-        }
-        objaveElement.innerHTML = objaveString;
-    };
-    xhr.send();
 </script>
 {% endblock content %}
