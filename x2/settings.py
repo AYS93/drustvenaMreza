@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-%yx+*&56a*fg3$q=!nw^+s!=6&_hmr20_@lkf865!nod9bkp3&
 DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1']
-
+LOGIN_URL = "/login"
 
 # Application definition
 
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'rest_framework',
     'objave'
 ]
 

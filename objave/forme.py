@@ -1,7 +1,7 @@
 from django import forms
 from .models import Objava
 
-MAX_LENGTH_OBJAVA = 240
+MAX_LENGTH_OBJAVA = 12
 
 class ObjavaForma(forms.ModelForm):
     class Meta:

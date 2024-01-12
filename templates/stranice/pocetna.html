@@ -11,8 +11,9 @@
     <div class="col-md-4 mx-auto col-10">
         <form class="form" id="forma-objava-kreiraj" method="POST" action="/objava-kreiraj">
             {% csrf_token %}
+            <div class="d-none alert alert-danger" id="objava-kreiraj-forma-error"></div>
             <input type="hidden" value="/" name="next"/>
-            <textarea class="form-control" name="sadrzaj" placeholder="Vaša objava..."></textarea>
+            <textarea required="required" class="form-control" name="sadrzaj" placeholder="Vaša objava..."></textarea>
             <br/>
             <button type="submit" class="btn btn-primary">Objavi</button>
         </form>
@@ -27,6 +28,16 @@
     const formaObjavaKreirajElement = document.getElementById("forma-objava-kreiraj");
     const objaveElement = document.getElementById("objave");
 
+    function handleObjavaFormaError(msg, display) {
+        var myErrorDiv = document.getElementById("objava-kreiraj-forma-error");
+        if (display === true) {
+            myErrorDiv.setAttribute("class", "alert alert-danger");
+            myErrorDiv.innerText = msg;
+        } else {
+            myErrorDiv.setAttribute("class", "d-none alert alert-danger");
+        }
+    }
+
     function handleFormaObjavaKreirajSubmit(event) {
         event.preventDefault();
         const mojaForma = event.target;
@@ -39,13 +50,37 @@
         xhr.setRequestHeader("HTTP_X_REQUESTED_WITH", "XMLHttpRequest");
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
         xhr.onload = function() {
-            if(xhr.status === 201) {
+            if (xhr.status === 201) {
+                handleObjavaFormaError("", false);
                 const novaObjava = xhr.response;
                 const novaObjavaJSON = JSON.parse(novaObjava);
                 const noviObjavaElement = formatirajObjaveElement(novaObjavaJSON);
-                console.log(noviObjavaElement);
+                const ogHtml = objaveElement.innerHTML;
+                objaveElement.innerHTML = noviObjavaElement + ogHtml;
+                mojaForma.reset();
+            } else if (xhr.status === 400) {
+                const sadrzajError = xhr.response.sadrzaj;
+                let sadrzajErrorPoruka;
+                if (sadrzajError) {
+                    sadrzajErrorPoruka = sadrzajError[0];
+                    if (sadrzajErrorPoruka) {
+                        handleObjavaFormaError(sadrzajErrorPoruka, true);
+                    } else {
+                        alert("Došlo je do greške.");
+                    }
+                } else {
+                    alert("Došlo je do greške :(");
+                }
+            } else if (xhr.status === 401) {
+                alert("Morate se prijaviti na Vaš nalog da biste nastavili.");
+                window.location.href = "/login";
+            } else if (xhr.status === 500) {
+                alert("Došlo je do greške na serveru. Pokušajte ponovo.");
             }
-        }
+        };
+        xhr.onerror = function() {
+            alert("Došlo je do greške. Pokušajte ponovo kasnije.");
+        };
         xhr.send(mojFormData);
     }
 
